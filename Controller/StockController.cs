@@ -1,0 +1,38 @@
+using api.Data;
+using api.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace api.Controllers
+{
+    [ApiController]
+    [Route("api/stock")]
+    public class StockController : ControllerBase
+    {
+        private readonly ApplicationDbContext _context;
+
+        public StockController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+
+        [HttpGet]
+
+        public ActionResult GetAllStocks()
+        {
+            var stocks = _context.Stocks.ToList();
+            return Ok(stocks);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult GetStockById([FromRoute] int id)
+        {
+            var stock = _context.Stocks.FirstOrDefault(s => s.Id == id);
+            if (stock == null)
+            {
+                return NotFound();
+            }
+            return Ok(stock);
+        }
+    }
+}
