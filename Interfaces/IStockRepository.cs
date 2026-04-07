@@ -18,6 +18,8 @@ namespace api.Interfaces
         Task<Stock?> UpdateStockAsync(int id, UpdateStockRequestDto updateStockRequestDto);
 
         Task<Stock?> DeleteStockAsync(int id);
+
+        Task<bool> StockExistsAsync(int id);
        
     }
 }

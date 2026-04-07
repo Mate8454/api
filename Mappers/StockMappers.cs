@@ -19,7 +19,8 @@ namespace api.Mappers
                 Purchase = StockModel.Purchase,
                 LastDiv = StockModel.LastDiv,
                 Industry = StockModel.Industry,
-                MarketCap = StockModel.MarketCap
+                MarketCap = StockModel.MarketCap,
+                Comments= StockModel.Comments.Select(c => c.ToCommentDto()).ToList()
             };
         }
 

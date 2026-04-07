@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Converters;
 using api.Data;
 using api.Interfaces;
 using api.Repository;
@@ -10,6 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
