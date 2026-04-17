@@ -6,6 +6,7 @@ using api.Models;
 using api.Interfaces;
 using api.Dtos.Stock;
 using Microsoft.Build.Experimental.ProjectCache;
+using api.Helpers;
 namespace api.Repository
 {
     public class StockRepository : IStockRepository
@@ -36,11 +37,23 @@ namespace api.Repository
             return stockModel;
         }
 
-        public async Task<List<Stock>> GetAllStocksAsync()
+        public async Task<List<Stock>> GetAllStocksAsync(QueryObject queryObject)
         {
-            return await _context.Stocks
+            var stocks = _context.Stocks
                 .Include(s => s.Comments)
-                .ToListAsync();
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(queryObject.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(queryObject.Symbol));
+            }
+
+            if (!string.IsNullOrEmpty(queryObject.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(queryObject.CompanyName));
+            }
+
+            return await stocks.ToListAsync();
         }
 
         public async Task<Stock?> GetStockByIdAsync(int id)

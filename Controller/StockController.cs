@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using api.Data;
 using api.Dtos.Stock;
+using api.Helpers;
 using api.Interfaces;
 using api.Mappers;
 using api.Models;
@@ -25,13 +26,13 @@ namespace api.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllStocks()
+        public async Task<IActionResult> GetAllStocks([FromQuery] QueryObject queryObject)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var stocks = await _stockRepository.GetAllStocksAsync();
+            var stocks = await _stockRepository.GetAllStocksAsync(queryObject);
             var stockDtos = stocks.Select(s => s.ToStockDto());
             return Ok(stockDtos);
         }
