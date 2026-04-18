@@ -53,7 +53,22 @@ namespace api.Repository
                 stocks = stocks.Where(s => s.CompanyName.Contains(queryObject.CompanyName));
             }
 
-            return await stocks.ToListAsync();
+            if (!string.IsNullOrEmpty(queryObject.SortBy))
+            {
+                if (queryObject.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = queryObject.IsDescending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
+                }
+                else if (queryObject.SortBy.Equals("CompanyName", StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = queryObject.IsDescending ? stocks.OrderByDescending(s => s.CompanyName) : stocks.OrderBy(s => s.CompanyName);
+                }
+            }
+
+            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
+           
+
+            return await stocks.Skip(skip).Take(queryObject.PageSize).ToListAsync();
         }
 
         public async Task<Stock?> GetStockByIdAsync(int id)
