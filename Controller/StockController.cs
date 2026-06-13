@@ -55,6 +55,7 @@ namespace api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateStock([FromBody] CreateStockRequestDto stockDto)
         {
+            
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
