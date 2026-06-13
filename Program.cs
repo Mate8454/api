@@ -8,6 +8,7 @@ using api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using api.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,12 +52,12 @@ builder.Services.AddAuthentication(options =>
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidIssuer = builder.Configuration.GetValue<string>("JWT:Issuer") ?? throw new InvalidOperationException("JWT issuer is not configured."),
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["JWT:Audience"],
+            ValidAudience = builder.Configuration.GetValue<string>("JWT:Audience") ?? throw new InvalidOperationException("JWT audience is not configured."),
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:Signingkey"])
+                System.Text.Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JWT:Signingkey") ?? throw new InvalidOperationException("JWT signing key is not configured."))
             )
         };
     }
@@ -64,6 +65,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 

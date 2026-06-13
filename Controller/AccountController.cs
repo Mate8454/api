@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Dtos.Account;
+using api.Interfaces;
 using api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,12 @@ namespace api.Controller
     {
         private readonly UserManager<AppUser> _userManager;
 
-        public AccountController(UserManager<AppUser> userManager)
+        private readonly ITokenService _tokenService;
+
+        public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
@@ -36,14 +40,22 @@ namespace api.Controller
                     Email = registerDto.Email
                 };
 
-                var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+                var password = registerDto.Password ?? throw new InvalidOperationException("Password is required.");
+                var createdUser = await _userManager.CreateAsync(appUser, password);
 
                 if (createdUser.Succeeded)
                 {
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
                     if (roleResult.Succeeded)
                     {
-                        return Ok("User registered successfully");
+                        return Ok(
+                            new NewUserDto
+                            {
+                                UserName = appUser.UserName,
+                                Email = appUser.Email,
+                                Token = _tokenService.CreateToken(appUser)
+                            }
+                        );
                     }
                     else
                     {
